@@ -184,6 +184,13 @@
             border-radius: 4px;
         }
 
+        .progress-text {
+            text-align: right;
+            font-size: 0.9em;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
         .navigation {
             display: flex;
             justify-content: space-between;
@@ -502,6 +509,7 @@
                 <div class="progress-bar">
                     <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
                 </div>
+                <div id="progress-text" class="progress-text" aria-live="polite"></div>
                 <div id="question-display"></div>
                 <div class="navigation">
                     <button id="prev-btn" class="btn btn-secondary">Previous</button>
@@ -959,6 +967,7 @@
             // Update progress bar
             const progress = ((questionIndex + 1) / totalQuestions) * 100;
             document.getElementById('progress-fill').style.width = `${progress}%`;
+            document.getElementById('progress-text').textContent = `Question ${questionIndex + 1} of ${totalQuestions}`;
             
             // Display question
             const questionDisplay = document.getElementById('question-display');
@@ -1085,6 +1094,10 @@
             let totalScore = 0;
             let factorScores = {};
             
+            let interpretation = '';
+            let severity = '';
+            let rawScore = null;
+
             if (assessmentType === 'PSS') {
                 // Handle reverse scoring for PSS
                 responses.forEach((response, index) => {
@@ -1096,12 +1109,15 @@
                 });
             } else if (assessmentType === 'QLES') {
                 // Special calculation for QLES
-                return assessment.scoring.calculate(responses);
+                const result = assessment.scoring.calculate(responses);
+                totalScore = result.percentage;
+                rawScore = result.raw;
+                interpretation = result.interpretation;
             } else {
                 // Standard scoring
                 totalScore = responses.reduce((sum, response) => sum + response, 0);
             }
-            
+
             // Calculate factor scores
             if (assessment.scoring.factors) {
                 for (const [factor, indices] of Object.entries(assessment.scoring.factors)) {
@@ -1112,11 +1128,9 @@
                     }
                 }
             }
-            
-            // Find interpretation
-            let interpretation = '';
-            let severity = '';
-            if (assessment.scoring.ranges) {
+
+            // Find interpretation from ranges when available
+            if (!interpretation && assessment.scoring.ranges) {
                 for (const range of assessment.scoring.ranges) {
                     if (totalScore >= range.min && totalScore <= range.max) {
                         interpretation = range.label;
@@ -1125,13 +1139,18 @@
                     }
                 }
             }
-            
-            return {
+
+            const scoreResult = {
                 total: totalScore,
                 factors: factorScores,
                 interpretation: interpretation,
                 severity: severity
             };
+            if (assessmentType === 'QLES') {
+                scoreResult.raw = rawScore;
+                scoreResult.percentage = totalScore;
+            }
+            return scoreResult;
         }
 
         function generateComprehensiveReport() {
