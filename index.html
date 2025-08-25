@@ -12,22 +12,24 @@
         }
 
         :root {
-            --primary: #4a90e2;
-            --secondary: #7c3aed;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --dark: #1f2937;
-            --light: #f9fafb;
-            --border: #e5e7eb;
-            --shadow: rgba(0, 0, 0, 0.1);
+            --primary-blue: #6B89B0;
+            --ivory: #FFFFF0;
+            --sage-green: #9CAF88;
+            --lavender-gray: #C4C0D0;
+            --warm-gray: #8B8680;
+            --pale-sky: #E6F0F7;
+            --misty-green: #E8F0E3;
+            --pearl-white: #FAF9F6;
+            --slate-blue-gray: #546A7B;
+            --periwinkle: #A8B4D0;
+            --shadow: rgba(107, 137, 176, 0.1);
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             line-height: 1.6;
-            color: var(--dark);
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--warm-gray);
+            background: var(--pearl-white);
             min-height: 100vh;
             padding: 20px;
         }
@@ -35,15 +37,16 @@
         .container {
             max-width: 900px;
             margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px var(--shadow);
+            background: var(--ivory);
+            border: 1px solid var(--lavender-gray);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px var(--shadow);
             overflow: hidden;
         }
 
         .header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
+            background: var(--pale-sky);
+            color: var(--slate-blue-gray);
             padding: 30px;
             text-align: center;
         }
@@ -52,11 +55,23 @@
             font-size: 2em;
             margin-bottom: 10px;
             font-weight: 600;
+            color: var(--slate-blue-gray);
         }
 
         .header p {
             opacity: 0.95;
             font-size: 1.1em;
+            color: var(--warm-gray);
+        }
+
+        a {
+            color: var(--periwinkle);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        a:hover {
+            color: var(--primary-blue);
         }
 
         .content {
@@ -71,41 +86,42 @@
         }
 
         .assessment-card {
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
+            border: 1px solid var(--lavender-gray);
+            border-radius: 8px;
+            padding: 24px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
             text-align: center;
-            background: white;
+            background: var(--ivory);
+            color: var(--warm-gray);
         }
 
         .assessment-card:hover {
-            border-color: var(--primary);
+            border-color: var(--primary-blue);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px var(--shadow);
+            background: var(--pale-sky);
         }
 
         .assessment-card.completed {
-            background: linear-gradient(135deg, #10b98110, #10b98120);
-            border-color: var(--success);
+            background: var(--misty-green);
+            border-color: var(--sage-green);
         }
 
         .assessment-card h3 {
-            color: var(--dark);
+            color: var(--slate-blue-gray);
             margin-bottom: 8px;
             font-size: 1.1em;
         }
 
         .assessment-card p {
-            color: #6b7280;
+            color: var(--warm-gray);
             font-size: 0.9em;
             margin-bottom: 10px;
         }
 
         .assessment-card .status {
             font-size: 0.85em;
-            color: var(--success);
+            color: var(--sage-green);
             font-weight: 600;
         }
 
@@ -125,15 +141,15 @@
 
         .question {
             margin-bottom: 25px;
-            padding: 20px;
-            background: var(--light);
-            border-radius: 12px;
-            border: 1px solid var(--border);
+            padding: 24px;
+            background: var(--ivory);
+            border-radius: 8px;
+            border: 1px solid var(--lavender-gray);
         }
 
         .question h4 {
             margin-bottom: 15px;
-            color: var(--dark);
+            color: var(--slate-blue-gray);
             font-size: 1.1em;
             font-weight: 500;
         }
@@ -148,30 +164,31 @@
             flex: 1;
             min-width: 120px;
             padding: 12px 20px;
-            border: 2px solid var(--border);
-            border-radius: 8px;
+            border: 2px solid var(--lavender-gray);
+            border-radius: 4px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
             text-align: center;
             background: white;
             font-size: 0.95em;
+            color: var(--warm-gray);
         }
 
         .option:hover {
-            border-color: var(--primary);
-            background: #f0f9ff;
+            border-color: var(--primary-blue);
+            background: var(--pale-sky);
         }
 
         .option.selected {
-            background: var(--primary);
+            background: var(--primary-blue);
             color: white;
-            border-color: var(--primary);
+            border-color: var(--primary-blue);
             font-weight: 600;
         }
 
         .progress-bar {
             height: 8px;
-            background: var(--border);
+            background: var(--pale-sky);
             border-radius: 4px;
             margin: 20px 0;
             overflow: hidden;
@@ -179,7 +196,7 @@
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            background: var(--sage-green);
             transition: width 0.3s ease;
             border-radius: 4px;
         }
@@ -188,7 +205,7 @@
             text-align: right;
             font-size: 0.9em;
             font-weight: 600;
-            color: var(--dark);
+            color: var(--slate-blue-gray);
         }
 
         .navigation {
@@ -201,39 +218,63 @@
         .btn {
             padding: 12px 30px;
             border: none;
-            border-radius: 8px;
+            border-radius: 4px;
             cursor: pointer;
             font-size: 1em;
             font-weight: 600;
-            transition: all 0.2s ease;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: var(--primary-blue);
             color: white;
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px var(--shadow);
+            background: var(--slate-blue-gray);
         }
 
         .btn-secondary {
             background: white;
-            color: var(--primary);
-            border: 2px solid var(--primary);
+            color: var(--primary-blue);
+            border: 2px solid var(--lavender-gray);
         }
 
         .btn-secondary:hover {
-            background: var(--primary);
-            color: white;
+            background: var(--pale-sky);
+            color: var(--primary-blue);
         }
 
         .btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+        }
+
+        .results-selector {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .results-selector.active {
+            display: block;
+            padding: 24px;
+            margin: 20px 0;
+            background: var(--ivory);
+            border: 1px solid var(--lavender-gray);
+            border-radius: 8px;
+        }
+
+        .results-selector h2 {
+            color: var(--slate-blue-gray);
+            margin-bottom: 15px;
+        }
+
+        .assessment-option {
+            display: block;
+            margin-bottom: 10px;
         }
 
         .results-container {
@@ -246,15 +287,15 @@
         }
 
         .score-card {
-            background: linear-gradient(135deg, #667eea15, #764ba215);
-            border-radius: 12px;
-            padding: 25px;
+            background: var(--pale-sky);
+            border-radius: 8px;
+            padding: 24px;
             margin-bottom: 25px;
-            border: 1px solid var(--border);
+            border: 1px solid var(--lavender-gray);
         }
 
         .score-card h3 {
-            color: var(--dark);
+            color: var(--slate-blue-gray);
             margin-bottom: 15px;
             font-size: 1.3em;
         }
@@ -262,12 +303,12 @@
         .score-value {
             font-size: 2.5em;
             font-weight: bold;
-            color: var(--primary);
+            color: var(--primary-blue);
             margin-bottom: 10px;
         }
 
         .score-interpretation {
-            color: #6b7280;
+            color: var(--warm-gray);
             font-size: 1em;
             line-height: 1.5;
         }
@@ -275,7 +316,7 @@
         .factor-analysis {
             margin-top: 20px;
             padding-top: 20px;
-            border-top: 1px solid var(--border);
+            border-top: 1px solid var(--lavender-gray);
         }
 
         .factor-item {
@@ -284,17 +325,18 @@
             align-items: center;
             margin-bottom: 12px;
             padding: 10px;
-            background: white;
+            background: var(--ivory);
+            border: 1px solid var(--lavender-gray);
             border-radius: 8px;
         }
 
         .factor-label {
             font-weight: 500;
-            color: var(--dark);
+            color: var(--slate-blue-gray);
         }
 
         .factor-score {
-            background: var(--primary);
+            background: var(--primary-blue);
             color: white;
             padding: 4px 12px;
             border-radius: 20px;
@@ -303,49 +345,49 @@
         }
 
         .narrative-section {
-            background: white;
-            border-radius: 12px;
+            background: var(--ivory);
+            border-radius: 8px;
             padding: 30px;
             margin-top: 30px;
-            border: 1px solid var(--border);
+            border: 1px solid var(--lavender-gray);
             line-height: 1.8;
         }
 
         .narrative-section h2 {
-            color: var(--dark);
+            color: var(--slate-blue-gray);
             margin-bottom: 20px;
             font-size: 1.5em;
-            border-bottom: 2px solid var(--primary);
+            border-bottom: 2px solid var(--primary-blue);
             padding-bottom: 10px;
         }
 
         .narrative-section h3 {
-            color: var(--primary);
+            color: var(--primary-blue);
             margin: 20px 0 15px;
             font-size: 1.2em;
         }
 
         .narrative-section p {
-            color: #4b5563;
+            color: var(--warm-gray);
             margin-bottom: 15px;
         }
 
         .intervention-card {
-            background: var(--light);
-            border-left: 4px solid var(--primary);
+            background: var(--pale-sky);
+            border-left: 4px solid var(--primary-blue);
             padding: 15px;
             margin: 15px 0;
             border-radius: 0 8px 8px 0;
         }
 
         .intervention-card h4 {
-            color: var(--dark);
+            color: var(--slate-blue-gray);
             margin-bottom: 10px;
             font-size: 1.1em;
         }
 
         .intervention-card p {
-            color: #6b7280;
+            color: var(--warm-gray);
             font-size: 0.95em;
             margin-bottom: 8px;
         }
@@ -361,23 +403,23 @@
         }
 
         .framework-badge.act {
-            background: #dbeafe;
-            color: #1e40af;
+            background: var(--pale-sky);
+            color: var(--primary-blue);
         }
 
         .framework-badge.dbt {
-            background: #fef3c7;
-            color: #92400e;
+            background: var(--misty-green);
+            color: var(--slate-blue-gray);
         }
 
         .framework-badge.narrative {
-            background: #d4d4d8;
-            color: #3f3f46;
+            background: var(--lavender-gray);
+            color: var(--slate-blue-gray);
         }
 
         .framework-badge.existential {
-            background: #e9d5ff;
-            color: #6b21a8;
+            background: var(--periwinkle);
+            color: white;
         }
 
         .export-buttons {
@@ -392,31 +434,31 @@
             min-width: 150px;
             padding: 15px;
             background: white;
-            border: 2px solid var(--primary);
-            color: var(--primary);
-            border-radius: 8px;
+            border: 2px solid var(--periwinkle);
+            color: var(--periwinkle);
+            border-radius: 4px;
             cursor: pointer;
             font-weight: 600;
-            transition: all 0.2s ease;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
             text-align: center;
         }
 
         .export-btn:hover {
-            background: var(--primary);
+            background: var(--periwinkle);
             color: white;
             transform: translateY(-2px);
         }
 
         .crisis-banner {
-            background: linear-gradient(135deg, #ef444420, #ef444430);
-            border: 2px solid var(--danger);
-            border-radius: 12px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid #ef4444;
+            border-radius: 8px;
             padding: 20px;
             margin: 20px 0;
         }
 
         .crisis-banner h4 {
-            color: var(--danger);
+            color: #ef4444;
             margin-bottom: 10px;
         }
 
@@ -426,13 +468,13 @@
         }
 
         .disclaimer {
-            background: #fef3c7;
-            border: 1px solid #fbbf24;
+            background: var(--misty-green);
+            border: 1px solid var(--sage-green);
             border-radius: 8px;
-            padding: 15px;
+            padding: 24px;
             margin: 20px 0;
             font-size: 0.9em;
-            color: #78350f;
+            color: var(--slate-blue-gray);
         }
 
         @media (max-width: 768px) {
@@ -502,6 +544,16 @@
                     <h3>Quality of Life Scale</h3>
                     <p>Evaluate life satisfaction</p>
                     <div class="status" id="qles-status"></div>
+                </div>
+            </div>
+            <button id="view-results-btn" class="btn btn-primary" style="display:none; width: 100%; margin: 20px 0;">View Results</button>
+
+            <div id="results-selector" class="results-selector">
+                <h2>Select assessments to include</h2>
+                <div id="completed-assessments-list"></div>
+                <div class="navigation">
+                    <button id="cancel-selection-btn" class="btn btn-secondary">Cancel</button>
+                    <button id="generate-selected-btn" class="btn btn-primary" disabled>Generate Findings</button>
                 </div>
             </div>
 
@@ -885,7 +937,8 @@
             sessionData: {
                 startTime: new Date(),
                 results: {}
-            }
+            },
+            generatedResults: null
         };
 
         // Initialize Application
@@ -908,6 +961,34 @@
             // Navigation buttons
             document.getElementById('prev-btn').addEventListener('click', previousQuestion);
             document.getElementById('next-btn').addEventListener('click', nextQuestion);
+
+            // View results button
+            document.getElementById('view-results-btn').addEventListener('click', function() {
+                if (appState.completedAssessments.length === 0) {
+                    alert('Please complete at least one assessment to view results.');
+                } else if (appState.completedAssessments.length === 1) {
+                    generateComprehensiveReport(appState.completedAssessments);
+                } else {
+                    showResultsSelector();
+                }
+            });
+
+            document.getElementById('completed-assessments-list').addEventListener('change', function() {
+                const anySelected = document.querySelectorAll('input[name="assessment-select"]:checked').length > 0;
+                document.getElementById('generate-selected-btn').disabled = !anySelected;
+            });
+
+            document.getElementById('generate-selected-btn').addEventListener('click', function() {
+                const selected = Array.from(document.querySelectorAll('input[name="assessment-select"]:checked')).map(i => i.value);
+                document.getElementById('results-selector').classList.remove('active');
+                if (selected.length > 0) {
+                    generateComprehensiveReport(selected);
+                }
+            });
+
+            document.getElementById('cancel-selection-btn').addEventListener('click', function() {
+                document.getElementById('results-selector').classList.remove('active');
+            });
         }
 
         function loadSavedData() {
@@ -936,9 +1017,22 @@
                 }
             });
 
-            if (appState.completedAssessments.length === 4) {
-                generateComprehensiveReport();
-            }
+            const resultsBtn = document.getElementById('view-results-btn');
+            resultsBtn.style.display = appState.completedAssessments.length > 0 ? 'block' : 'none';
+        }
+
+        function showResultsSelector() {
+            const selector = document.getElementById('results-selector');
+            const list = document.getElementById('completed-assessments-list');
+            list.innerHTML = '';
+            appState.completedAssessments.forEach(a => {
+                const label = document.createElement('label');
+                label.className = 'assessment-option';
+                label.innerHTML = `<input type="checkbox" name="assessment-select" value="${a}"> ${assessments[a].name}`;
+                list.appendChild(label);
+            });
+            document.getElementById('generate-selected-btn').disabled = true;
+            selector.classList.add('active');
         }
 
         function startAssessment(assessmentType) {
@@ -1079,14 +1173,11 @@
             saveProgress();
             updateAssessmentStatus();
             
-            // Show results or return to selector
-            if (appState.completedAssessments.length === 4) {
-                generateComprehensiveReport();
-            } else {
-                document.getElementById('question-container').classList.remove('active');
-                document.getElementById('assessment-selector').style.display = 'grid';
-                alert(`${assessments[assessmentType].name} completed! Please complete the remaining assessments.`);
-            }
+            // Return to selector and prompt user
+            document.getElementById('question-container').classList.remove('active');
+            document.getElementById('assessment-selector').style.display = 'grid';
+            document.getElementById('view-results-btn').style.display = 'block';
+            alert(`${assessments[assessmentType].name} completed! You may complete additional assessments or view results.`);
         }
 
         function calculateScore(assessmentType, responses) {
@@ -1153,24 +1244,30 @@
             return scoreResult;
         }
 
-        function generateComprehensiveReport() {
+        function generateComprehensiveReport(selectedAssessments = appState.completedAssessments) {
             document.getElementById('question-container').classList.remove('active');
             document.getElementById('assessment-selector').style.display = 'none';
             document.getElementById('results-container').classList.add('active');
-            
-            const results = appState.sessionData.results;
+
+            const results = {};
+            selectedAssessments.forEach(a => {
+                if (appState.sessionData.results[a]) {
+                    results[a] = appState.sessionData.results[a];
+                }
+            });
+            appState.generatedResults = results;
             const resultsContent = document.getElementById('results-content');
-            
+
             // Check for crisis indicators
             const crisisCheck = checkCrisisIndicators(results);
-            
+
             resultsContent.innerHTML = `
                 ${crisisCheck ? generateCrisisBanner(crisisCheck) : ''}
-                
-                <h2 style="color: var(--dark); margin-bottom: 30px; text-align: center;">
+
+                <h2 style="color: var(--slate-blue-gray); margin-bottom: 30px; text-align: center;">
                     Your Comprehensive Assessment Results
                 </h2>
-                
+
                 ${generateScoreCards(results)}
                 ${generateIntegratedNarrative(results)}
                 ${generateTherapeuticInterventions(results)}
@@ -1686,7 +1783,8 @@
         }
 
         function exportJSON() {
-            const dataStr = JSON.stringify(appState.sessionData, null, 2);
+            const data = appState.generatedResults || appState.sessionData.results;
+            const dataStr = JSON.stringify(data, null, 2);
             const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
             const exportFileDefaultName = `assessment_data_${new Date().toISOString().slice(0,10)}.json`;
             
@@ -1697,7 +1795,8 @@
         }
 
         function exportWorkbook() {
-            const workbook = generatePersonalWorkbook(appState.sessionData.results);
+            const data = appState.generatedResults || appState.sessionData.results;
+            const workbook = generatePersonalWorkbook(data);
             const dataUri = 'data:text/html;charset=utf-8,'+ encodeURIComponent(workbook);
             const exportFileDefaultName = `personal_workbook_${new Date().toISOString().slice(0,10)}.html`;
             
@@ -1708,6 +1807,18 @@
         }
 
         function generatePersonalWorkbook(results) {
+            let resultSections = '';
+            for (const [assessment, data] of Object.entries(results)) {
+                const info = assessments[assessment];
+                resultSections += `
+                    <div class="result-section">
+                        <h2>${info.name} Results</h2>
+                        <p><strong>Total Score:</strong> ${assessment === 'QLES' ? data.score.percentage + '%' : data.score.total}</p>
+                        ${generateWorkbookFactorList(data.score.factors)}
+                    </div>
+                `;
+            }
+
             return `
                 <!DOCTYPE html>
                 <html>
@@ -1715,17 +1826,21 @@
                     <title>Personal Therapy Workbook</title>
                     <style>
                         body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-                        h1 { color: #4a90e2; }
-                        h2 { color: #7c3aed; margin-top: 30px; }
-                        .exercise { background: #f9fafb; padding: 20px; margin: 20px 0; border-radius: 8px; }
+                        h1 { color: #6B89B0; }
+                        h2 { color: #546A7B; margin-top: 30px; }
+                        .exercise { background: #FFFFF0; padding: 20px; margin: 20px 0; border-radius: 8px; }
+                        .result-section { background: #E6F0F7; padding: 20px; margin: 20px 0; border-radius: 8px; border: 1px solid #C4C0D0; }
+                        .factor-list { list-style: none; padding-left: 0; }
+                        .factor-list li { margin: 5px 0; }
                         .prompt { font-weight: bold; margin: 10px 0; }
-                        .space { height: 100px; border: 1px dashed #ccc; margin: 10px 0; padding: 10px; }
+                        .space { height: 100px; border: 1px dashed #C4C0D0; margin: 10px 0; padding: 10px; }
                     </style>
                 </head>
                 <body>
                     <h1>Your Personal Therapy Workbook</h1>
                     <p>Generated: ${new Date().toLocaleDateString()}</p>
-                    
+                    ${resultSections}
+
                     <h2>ACT Exercises</h2>
                     <div class="exercise">
                         <div class="prompt">Values Clarification</div>
@@ -1734,7 +1849,7 @@
                         <p>What would you do if anxiety couldn't stop you?</p>
                         <div class="space"></div>
                     </div>
-                    
+
                     <h2>Narrative Therapy Exercises</h2>
                     <div class="exercise">
                         <div class="prompt">Externalization Practice</div>
@@ -1743,7 +1858,7 @@
                         <p>When has this problem had less influence over you?</p>
                         <div class="space"></div>
                     </div>
-                    
+
                     <h2>DBT Diary Card</h2>
                     <div class="exercise">
                         <div class="prompt">Daily Skills Practice</div>
@@ -1752,7 +1867,7 @@
                         <p>Rate your emotions (0-10):</p>
                         <div class="space"></div>
                     </div>
-                    
+
                     <h2>Existential Reflection</h2>
                     <div class="exercise">
                         <div class="prompt">Meaning-Making</div>
@@ -1764,6 +1879,36 @@
                 </body>
                 </html>
             `;
+        }
+
+        function generateWorkbookFactorList(factors) {
+            if (!factors || Object.keys(factors).length === 0) return '';
+
+            const factorLabels = {
+                somatic: 'Somatic Symptoms',
+                subjective: 'Subjective Anxiety',
+                panic: 'Panic Symptoms',
+                autonomic: 'Autonomic Symptoms',
+                cognitive: 'Cognitive Symptoms',
+                affective: 'Affective Symptoms',
+                helplessness: 'Perceived Helplessness',
+                self_efficacy: 'Self-Efficacy',
+                physical: 'Physical Well-being',
+                emotional: 'Emotional Well-being',
+                social: 'Social Functioning',
+                occupational: 'Occupational Functioning',
+                daily: 'Daily Activities',
+                overall: 'Overall Satisfaction'
+            };
+
+            let html = '<ul class="factor-list">';
+            for (const [factor, score] of Object.entries(factors)) {
+                const label = factorLabels[factor] || factor;
+                const displayScore = (score * 25).toFixed(0);
+                html += `<li>${label}: ${displayScore}%</li>`;
+            }
+            html += '</ul>';
+            return html;
         }
 
         function printReport() {
@@ -1780,7 +1925,8 @@
                 sessionData: {
                     startTime: new Date(),
                     results: {}
-                }
+                },
+                generatedResults: null
             };
             
             // Clear local storage
@@ -1788,6 +1934,8 @@
             
             // Reset UI
             document.getElementById('results-container').classList.remove('active');
+            document.getElementById('results-selector').classList.remove('active');
+            document.getElementById('completed-assessments-list').innerHTML = '';
             document.getElementById('assessment-selector').style.display = 'grid';
             document.querySelectorAll('.assessment-card').forEach(card => {
                 card.classList.remove('completed');
@@ -1795,6 +1943,7 @@
             document.querySelectorAll('.status').forEach(status => {
                 status.textContent = '';
             });
+            document.getElementById('view-results-btn').style.display = 'none';
         }
     </script>
 </body>
