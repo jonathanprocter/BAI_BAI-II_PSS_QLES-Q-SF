@@ -1,0 +1,10 @@
+{
+  "name": "mental-health-assessment-suite",
+  "version": "1.0.0",
+  "description": "Client-side mental health assessment application",
+  "scripts": {
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "license": "MIT"
+}
+
