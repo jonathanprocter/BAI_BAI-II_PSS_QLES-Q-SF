@@ -253,6 +253,30 @@
             cursor: not-allowed;
         }
 
+        .results-selector {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .results-selector.active {
+            display: block;
+            padding: 24px;
+            margin: 20px 0;
+            background: var(--ivory);
+            border: 1px solid var(--lavender-gray);
+            border-radius: 8px;
+        }
+
+        .results-selector h2 {
+            color: var(--slate-blue-gray);
+            margin-bottom: 15px;
+        }
+
+        .assessment-option {
+            display: block;
+            margin-bottom: 10px;
+        }
+
         .results-container {
             display: none;
             animation: fadeIn 0.5s ease;
@@ -520,6 +544,16 @@
                     <h3>Quality of Life Scale</h3>
                     <p>Evaluate life satisfaction</p>
                     <div class="status" id="qles-status"></div>
+                </div>
+            </div>
+            <button id="view-results-btn" class="btn btn-primary" style="display:none; width: 100%; margin: 20px 0;">View Results</button>
+
+            <div id="results-selector" class="results-selector">
+                <h2>Select assessments to include</h2>
+                <div id="completed-assessments-list"></div>
+                <div class="navigation">
+                    <button id="cancel-selection-btn" class="btn btn-secondary">Cancel</button>
+                    <button id="generate-selected-btn" class="btn btn-primary" disabled>Generate Findings</button>
                 </div>
             </div>
 
@@ -903,7 +937,8 @@
             sessionData: {
                 startTime: new Date(),
                 results: {}
-            }
+            },
+            generatedResults: null
         };
 
         // Initialize Application
@@ -926,6 +961,34 @@
             // Navigation buttons
             document.getElementById('prev-btn').addEventListener('click', previousQuestion);
             document.getElementById('next-btn').addEventListener('click', nextQuestion);
+
+            // View results button
+            document.getElementById('view-results-btn').addEventListener('click', function() {
+                if (appState.completedAssessments.length === 0) {
+                    alert('Please complete at least one assessment to view results.');
+                } else if (appState.completedAssessments.length === 1) {
+                    generateComprehensiveReport(appState.completedAssessments);
+                } else {
+                    showResultsSelector();
+                }
+            });
+
+            document.getElementById('completed-assessments-list').addEventListener('change', function() {
+                const anySelected = document.querySelectorAll('input[name="assessment-select"]:checked').length > 0;
+                document.getElementById('generate-selected-btn').disabled = !anySelected;
+            });
+
+            document.getElementById('generate-selected-btn').addEventListener('click', function() {
+                const selected = Array.from(document.querySelectorAll('input[name="assessment-select"]:checked')).map(i => i.value);
+                document.getElementById('results-selector').classList.remove('active');
+                if (selected.length > 0) {
+                    generateComprehensiveReport(selected);
+                }
+            });
+
+            document.getElementById('cancel-selection-btn').addEventListener('click', function() {
+                document.getElementById('results-selector').classList.remove('active');
+            });
         }
 
         function loadSavedData() {
@@ -954,9 +1017,22 @@
                 }
             });
 
-            if (appState.completedAssessments.length === 4) {
-                generateComprehensiveReport();
-            }
+            const resultsBtn = document.getElementById('view-results-btn');
+            resultsBtn.style.display = appState.completedAssessments.length > 0 ? 'block' : 'none';
+        }
+
+        function showResultsSelector() {
+            const selector = document.getElementById('results-selector');
+            const list = document.getElementById('completed-assessments-list');
+            list.innerHTML = '';
+            appState.completedAssessments.forEach(a => {
+                const label = document.createElement('label');
+                label.className = 'assessment-option';
+                label.innerHTML = `<input type="checkbox" name="assessment-select" value="${a}"> ${assessments[a].name}`;
+                list.appendChild(label);
+            });
+            document.getElementById('generate-selected-btn').disabled = true;
+            selector.classList.add('active');
         }
 
         function startAssessment(assessmentType) {
@@ -1097,14 +1173,11 @@
             saveProgress();
             updateAssessmentStatus();
             
-            // Show results or return to selector
-            if (appState.completedAssessments.length === 4) {
-                generateComprehensiveReport();
-            } else {
-                document.getElementById('question-container').classList.remove('active');
-                document.getElementById('assessment-selector').style.display = 'grid';
-                alert(`${assessments[assessmentType].name} completed! Please complete the remaining assessments.`);
-            }
+            // Return to selector and prompt user
+            document.getElementById('question-container').classList.remove('active');
+            document.getElementById('assessment-selector').style.display = 'grid';
+            document.getElementById('view-results-btn').style.display = 'block';
+            alert(`${assessments[assessmentType].name} completed! You may complete additional assessments or view results.`);
         }
 
         function calculateScore(assessmentType, responses) {
@@ -1171,24 +1244,30 @@
             return scoreResult;
         }
 
-        function generateComprehensiveReport() {
+        function generateComprehensiveReport(selectedAssessments = appState.completedAssessments) {
             document.getElementById('question-container').classList.remove('active');
             document.getElementById('assessment-selector').style.display = 'none';
             document.getElementById('results-container').classList.add('active');
-            
-            const results = appState.sessionData.results;
+
+            const results = {};
+            selectedAssessments.forEach(a => {
+                if (appState.sessionData.results[a]) {
+                    results[a] = appState.sessionData.results[a];
+                }
+            });
+            appState.generatedResults = results;
             const resultsContent = document.getElementById('results-content');
-            
+
             // Check for crisis indicators
             const crisisCheck = checkCrisisIndicators(results);
-            
+
             resultsContent.innerHTML = `
                 ${crisisCheck ? generateCrisisBanner(crisisCheck) : ''}
-                
+
                 <h2 style="color: var(--slate-blue-gray); margin-bottom: 30px; text-align: center;">
                     Your Comprehensive Assessment Results
                 </h2>
-                
+
                 ${generateScoreCards(results)}
                 ${generateIntegratedNarrative(results)}
                 ${generateTherapeuticInterventions(results)}
@@ -1704,7 +1783,8 @@
         }
 
         function exportJSON() {
-            const dataStr = JSON.stringify(appState.sessionData, null, 2);
+            const data = appState.generatedResults || appState.sessionData.results;
+            const dataStr = JSON.stringify(data, null, 2);
             const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
             const exportFileDefaultName = `assessment_data_${new Date().toISOString().slice(0,10)}.json`;
             
@@ -1715,7 +1795,8 @@
         }
 
         function exportWorkbook() {
-            const workbook = generatePersonalWorkbook(appState.sessionData.results);
+            const data = appState.generatedResults || appState.sessionData.results;
+            const workbook = generatePersonalWorkbook(data);
             const dataUri = 'data:text/html;charset=utf-8,'+ encodeURIComponent(workbook);
             const exportFileDefaultName = `personal_workbook_${new Date().toISOString().slice(0,10)}.html`;
             
@@ -1726,6 +1807,18 @@
         }
 
         function generatePersonalWorkbook(results) {
+            let resultSections = '';
+            for (const [assessment, data] of Object.entries(results)) {
+                const info = assessments[assessment];
+                resultSections += `
+                    <div class="result-section">
+                        <h2>${info.name} Results</h2>
+                        <p><strong>Total Score:</strong> ${assessment === 'QLES' ? data.score.percentage + '%' : data.score.total}</p>
+                        ${generateWorkbookFactorList(data.score.factors)}
+                    </div>
+                `;
+            }
+
             return `
                 <!DOCTYPE html>
                 <html>
@@ -1743,7 +1836,8 @@
                 <body>
                     <h1>Your Personal Therapy Workbook</h1>
                     <p>Generated: ${new Date().toLocaleDateString()}</p>
-                    
+                    ${resultSections}
+
                     <h2>ACT Exercises</h2>
                     <div class="exercise">
                         <div class="prompt">Values Clarification</div>
@@ -1752,7 +1846,7 @@
                         <p>What would you do if anxiety couldn't stop you?</p>
                         <div class="space"></div>
                     </div>
-                    
+
                     <h2>Narrative Therapy Exercises</h2>
                     <div class="exercise">
                         <div class="prompt">Externalization Practice</div>
@@ -1761,7 +1855,7 @@
                         <p>When has this problem had less influence over you?</p>
                         <div class="space"></div>
                     </div>
-                    
+
                     <h2>DBT Diary Card</h2>
                     <div class="exercise">
                         <div class="prompt">Daily Skills Practice</div>
@@ -1770,7 +1864,7 @@
                         <p>Rate your emotions (0-10):</p>
                         <div class="space"></div>
                     </div>
-                    
+
                     <h2>Existential Reflection</h2>
                     <div class="exercise">
                         <div class="prompt">Meaning-Making</div>
@@ -1782,6 +1876,36 @@
                 </body>
                 </html>
             `;
+        }
+
+        function generateWorkbookFactorList(factors) {
+            if (!factors || Object.keys(factors).length === 0) return '';
+
+            const factorLabels = {
+                somatic: 'Somatic Symptoms',
+                subjective: 'Subjective Anxiety',
+                panic: 'Panic Symptoms',
+                autonomic: 'Autonomic Symptoms',
+                cognitive: 'Cognitive Symptoms',
+                affective: 'Affective Symptoms',
+                helplessness: 'Perceived Helplessness',
+                self_efficacy: 'Self-Efficacy',
+                physical: 'Physical Well-being',
+                emotional: 'Emotional Well-being',
+                social: 'Social Functioning',
+                occupational: 'Occupational Functioning',
+                daily: 'Daily Activities',
+                overall: 'Overall Satisfaction'
+            };
+
+            let html = '<ul class="factor-list">';
+            for (const [factor, score] of Object.entries(factors)) {
+                const label = factorLabels[factor] || factor;
+                const displayScore = (score * 25).toFixed(0);
+                html += `<li>${label}: ${displayScore}%</li>`;
+            }
+            html += '</ul>';
+            return html;
         }
 
         function printReport() {
@@ -1798,7 +1922,8 @@
                 sessionData: {
                     startTime: new Date(),
                     results: {}
-                }
+                },
+                generatedResults: null
             };
             
             // Clear local storage
@@ -1806,6 +1931,8 @@
             
             // Reset UI
             document.getElementById('results-container').classList.remove('active');
+            document.getElementById('results-selector').classList.remove('active');
+            document.getElementById('completed-assessments-list').innerHTML = '';
             document.getElementById('assessment-selector').style.display = 'grid';
             document.querySelectorAll('.assessment-card').forEach(card => {
                 card.classList.remove('completed');
@@ -1813,6 +1940,7 @@
             document.querySelectorAll('.status').forEach(status => {
                 status.textContent = '';
             });
+            document.getElementById('view-results-btn').style.display = 'none';
         }
     </script>
 </body>
