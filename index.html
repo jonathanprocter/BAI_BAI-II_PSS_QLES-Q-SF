@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integrative Mental Health Assessment Suite</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #4a90e2;
+            --secondary: #7c3aed;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --light: #f9fafb;
+            --border: #e5e7eb;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px var(--shadow);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header p {
+            opacity: 0.95;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .assessment-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .assessment-card {
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            background: white;
+        }
+
+        .assessment-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .assessment-card.completed {
+            background: linear-gradient(135deg, #10b98110, #10b98120);
+            border-color: var(--success);
+        }
+
+        .assessment-card h3 {
+            color: var(--dark);
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .assessment-card p {
+            color: #6b7280;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .assessment-card .status {
+            font-size: 0.85em;
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .question-container {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .question-container.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: var(--light);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .question h4 {
+            margin-bottom: 15px;
+            color: var(--dark);
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .option {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 20px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            background: white;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            border-color: var(--primary);
+            background: #f0f9ff;
+        }
+
+        .option.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .results-container {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .results-container.active {
+            display: block;
+        }
+
+        .score-card {
+            background: linear-gradient(135deg, #667eea15, #764ba215);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
+        }
+
+        .score-card h3 {
+            color: var(--dark);
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .score-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .score-interpretation {
+            color: #6b7280;
+            font-size: 1em;
+            line-height: 1.5;
+        }
+
+        .factor-analysis {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .factor-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .factor-label {
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .factor-score {
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .narrative-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 30px;
+            border: 1px solid var(--border);
+            line-height: 1.8;
+        }
+
+        .narrative-section h2 {
+            color: var(--dark);
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+        }
+
+        .narrative-section h3 {
+            color: var(--primary);
+            margin: 20px 0 15px;
+            font-size: 1.2em;
+        }
+
+        .narrative-section p {
+            color: #4b5563;
+            margin-bottom: 15px;
+        }
+
+        .intervention-card {
+            background: var(--light);
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .intervention-card h4 {
+            color: var(--dark);
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .intervention-card p {
+            color: #6b7280;
+            font-size: 0.95em;
+            margin-bottom: 8px;
+        }
+
+        .framework-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .framework-badge.act {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .framework-badge.dbt {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .framework-badge.narrative {
+            background: #d4d4d8;
+            color: #3f3f46;
+        }
+
+        .framework-badge.existential {
+            background: #e9d5ff;
+            color: #6b21a8;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .export-btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px;
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .export-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .crisis-banner {
+            background: linear-gradient(135deg, #ef444420, #ef444430);
+            border: 2px solid var(--danger);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .crisis-banner h4 {
+            color: var(--danger);
+            margin-bottom: 10px;
+        }
+
+        .crisis-banner p {
+            color: #7f1d1d;
+            margin-bottom: 10px;
+        }
+
+        .disclaimer {
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 0.9em;
+            color: #78350f;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 0;
+                margin: -20px;
+            }
+            
+            .options {
+                flex-direction: column;
+            }
+            
+            .option {
+                width: 100%;
+            }
+            
+            .export-buttons {
+                flex-direction: column;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+            }
+            
+            .btn, .export-buttons {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Integrative Mental Health Assessment</h1>
+            <p>ACT • Narrative • DBT • Existential Approach</p>
+        </div>
+        
+        <div class="content">
+            <div class="disclaimer">
+                <strong>Important:</strong> This assessment tool is for self-reflection and educational purposes. It does not replace professional mental health evaluation. If you're experiencing distress, please consult with a qualified mental health professional.
+            </div>
+
+            <div id="assessment-selector" class="assessment-selector">
+                <div class="assessment-card" data-assessment="BAI">
+                    <h3>Beck Anxiety Inventory</h3>
+                    <p>Assess anxiety symptoms</p>
+                    <div class="status" id="bai-status"></div>
+                </div>
+                <div class="assessment-card" data-assessment="BDI">
+                    <h3>Beck Depression Inventory-II</h3>
+                    <p>Screen for depression</p>
+                    <div class="status" id="bdi-status"></div>
+                </div>
+                <div class="assessment-card" data-assessment="PSS">
+                    <h3>Perceived Stress Scale</h3>
+                    <p>Measure stress levels</p>
+                    <div class="status" id="pss-status"></div>
+                </div>
+                <div class="assessment-card" data-assessment="QLES">
+                    <h3>Quality of Life Scale</h3>
+                    <p>Evaluate life satisfaction</p>
+                    <div class="status" id="qles-status"></div>
+                </div>
+            </div>
+
+            <div id="question-container" class="question-container">
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+                </div>
+                <div id="question-display"></div>
+                <div class="navigation">
+                    <button id="prev-btn" class="btn btn-secondary">Previous</button>
+                    <button id="next-btn" class="btn btn-primary">Next</button>
+                </div>
+            </div>
+
+            <div id="results-container" class="results-container">
+                <div id="results-content"></div>
+                <div class="export-buttons">
+                    <button onclick="exportPDF()" class="export-btn">📄 Export PDF</button>
+                    <button onclick="exportJSON()" class="export-btn">💾 Export Data</button>
+                    <button onclick="exportWorkbook()" class="export-btn">📚 Personal Workbook</button>
+                    <button onclick="printReport()" class="export-btn">🖨️ Print Report</button>
+                </div>
+                <button onclick="startNewAssessment()" class="btn btn-primary" style="width: 100%; margin-top: 20px;">Start New Assessment</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Assessment Questions Database
+        const assessments = {
+            BAI: {
+                name: "Beck Anxiety Inventory",
+                instructions: "Indicate how much you have been bothered by each symptom during the past month, including today.",
+                questions: [
+                    "Numbness or tingling",
+                    "Feeling hot",
+                    "Wobbliness in legs",
+                    "Unable to relax",
+                    "Fear of worst happening",
+                    "Dizzy or lightheaded",
+                    "Heart pounding/racing",
+                    "Unsteady",
+                    "Terrified or afraid",
+                    "Nervous",
+                    "Feeling of choking",
+                    "Hands trembling",
+                    "Shaky / unsteady",
+                    "Fear of losing control",
+                    "Difficulty in breathing",
+                    "Fear of dying",
+                    "Scared",
+                    "Indigestion",
+                    "Faint / lightheaded",
+                    "Face flushed",
+                    "Hot/cold sweats"
+                ],
+                options: [
+                    "Not at all",
+                    "Mildly",
+                    "Moderately",
+                    "Severely"
+                ],
+                scoring: {
+                    ranges: [
+                        { min: 0, max: 21, label: "Low anxiety", color: "#10b981" },
+                        { min: 22, max: 35, label: "Moderate anxiety", color: "#f59e0b" },
+                        { min: 36, max: 63, label: "High anxiety", color: "#ef4444" }
+                    ],
+                    factors: {
+                        somatic: [0, 1, 2, 5, 6, 7, 10, 11, 12, 17, 18, 19, 20],
+                        subjective: [3, 4, 8, 9, 13, 14, 15, 16],
+                        panic: [6, 10, 11, 14, 15],
+                        autonomic: [1, 17, 18, 19, 20]
+                    }
+                }
+            },
+            BDI: {
+                name: "Beck Depression Inventory-II",
+                instructions: "Choose the statement that best describes how you have been feeling during the past two weeks, including today.",
+                questions: [
+                    {
+                        item: "Sadness",
+                        options: [
+                            "I do not feel sad",
+                            "I feel sad much of the time",
+                            "I am sad all the time",
+                            "I am so sad or unhappy that I can't stand it"
+                        ]
+                    },
+                    {
+                        item: "Pessimism",
+                        options: [
+                            "I am not discouraged about my future",
+                            "I feel more discouraged about my future than I used to",
+                            "I do not expect things to work out for me",
+                            "I feel my future is hopeless and will only get worse"
+                        ]
+                    },
+                    {
+                        item: "Past Failure",
+                        options: [
+                            "I do not feel like a failure",
+                            "I have failed more than I should have",
+                            "As I look back, I see a lot of failures",
+                            "I feel I am a total failure as a person"
+                        ]
+                    },
+                    {
+                        item: "Loss of Pleasure",
+                        options: [
+                            "I get as much pleasure as I ever did from the things I enjoy",
+                            "I don't enjoy things as much as I used to",
+                            "I get very little pleasure from the things I used to enjoy",
+                            "I can't get any pleasure from the things I used to enjoy"
+                        ]
+                    },
+                    {
+                        item: "Guilty Feelings",
+                        options: [
+                            "I don't feel particularly guilty",
+                            "I feel guilty over many things I have done or should have done",
+                            "I feel quite guilty most of the time",
+                            "I feel guilty all of the time"
+                        ]
+                    },
+                    {
+                        item: "Punishment Feelings",
+                        options: [
+                            "I don't feel I am being punished",
+                            "I feel I may be punished",
+                            "I expect to be punished",
+                            "I feel I am being punished"
+                        ]
+                    },
+                    {
+                        item: "Self-Dislike",
+                        options: [
+                            "I feel the same about myself as ever",
+                            "I have lost confidence in myself",
+                            "I am disappointed in myself",
+                            "I dislike myself"
+                        ]
+                    },
+                    {
+                        item: "Self-Criticalness",
+                        options: [
+                            "I don't criticize or blame myself more than usual",
+                            "I am more critical of myself than I used to be",
+                            "I criticize myself for all of my faults",
+                            "I blame myself for everything bad that happens"
+                        ]
+                    },
+                    {
+                        item: "Suicidal Thoughts or Wishes",
+                        options: [
+                            "I don't have any thoughts of killing myself",
+                            "I have thoughts of killing myself, but I would not carry them out",
+                            "I would like to kill myself",
+                            "I would kill myself if I had the chance"
+                        ]
+                    },
+                    {
+                        item: "Crying",
+                        options: [
+                            "I don't cry anymore than I used to",
+                            "I cry more than I used to",
+                            "I cry over every little thing",
+                            "I feel like crying, but I can't"
+                        ]
+                    },
+                    {
+                        item: "Agitation",
+                        options: [
+                            "I am no more restless or wound up than usual",
+                            "I feel more restless or wound up than usual",
+                            "I am so restless or agitated, it's hard to stay still",
+                            "I am so restless or agitated that I have to keep moving or doing something"
+                        ]
+                    },
+                    {
+                        item: "Loss of Interest",
+                        options: [
+                            "I have not lost interest in other people or activities",
+                            "I am less interested in other people or things than before",
+                            "I have lost most of my interest in other people or things",
+                            "It's hard to get interested in anything"
+                        ]
+                    },
+                    {
+                        item: "Indecisiveness",
+                        options: [
+                            "I make decisions about as well as ever",
+                            "I find it more difficult to make decisions than usual",
+                            "I have much greater difficulty in making decisions than I used to",
+                            "I have trouble making any decisions"
+                        ]
+                    },
+                    {
+                        item: "Worthlessness",
+                        options: [
+                            "I do not feel I am worthless",
+                            "I don't consider myself as worthwhile and useful as I used to",
+                            "I feel more worthless as compared to others",
+                            "I feel utterly worthless"
+                        ]
+                    },
+                    {
+                        item: "Loss of Energy",
+                        options: [
+                            "I have as much energy as ever",
+                            "I have less energy than I used to have",
+                            "I don't have enough energy to do very much",
+                            "I don't have enough energy to do anything"
+                        ]
+                    },
+                    {
+                        item: "Changes in Sleeping Pattern",
+                        options: [
+                            "I have not experienced any change in my sleeping",
+                            "I sleep somewhat more/less than usual",
+                            "I sleep a lot more/less than usual",
+                            "I sleep most of the day OR wake up 1-2 hours early and can't get back to sleep"
+                        ]
+                    },
+                    {
+                        item: "Irritability",
+                        options: [
+                            "I am not more irritable than usual",
+                            "I am more irritable than usual",
+                            "I am much more irritable than usual",
+                            "I am irritable all the time"
+                        ]
+                    },
+                    {
+                        item: "Changes in Appetite",
+                        options: [
+                            "I have not experienced any change in my appetite",
+                            "My appetite is somewhat less/greater than usual",
+                            "My appetite is much less/greater than before",
+                            "I have no appetite at all OR I crave food all the time"
+                        ]
+                    },
+                    {
+                        item: "Concentration Difficulty",
+                        options: [
+                            "I can concentrate as well as ever",
+                            "I can't concentrate as well as usual",
+                            "It's hard to keep my mind on anything for very long",
+                            "I find I can't concentrate on anything"
+                        ]
+                    },
+                    {
+                        item: "Tiredness or Fatigue",
+                        options: [
+                            "I am no more tired or fatigued than usual",
+                            "I get more tired or fatigued more easily than usual",
+                            "I am too tired or fatigued to do a lot of the things I used to do",
+                            "I am too tired or fatigued to do most of the things I used to do"
+                        ]
+                    },
+                    {
+                        item: "Loss of Interest in Sex",
+                        options: [
+                            "I have not noticed any recent change in my interest in sex",
+                            "I am less interested in sex than I used to be",
+                            "I am much less interested in sex now",
+                            "I have lost interest in sex completely"
+                        ]
+                    }
+                ],
+                scoring: {
+                    ranges: [
+                        { min: 0, max: 13, label: "Minimal depression", color: "#10b981" },
+                        { min: 14, max: 19, label: "Mild depression", color: "#eab308" },
+                        { min: 20, max: 28, label: "Moderate depression", color: "#f59e0b" },
+                        { min: 29, max: 63, label: "Severe depression", color: "#ef4444" }
+                    ],
+                    factors: {
+                        cognitive: [0, 1, 2, 4, 5, 6, 7, 8, 13],
+                        affective: [3, 9, 10, 11, 12],
+                        somatic: [14, 15, 16, 17, 18, 19, 20]
+                    }
+                }
+            },
+            PSS: {
+                name: "Perceived Stress Scale",
+                instructions: "For each question, indicate how often you felt or thought a certain way during the last month.",
+                questions: [
+                    "In the last month, how often have you been upset because of something that happened unexpectedly?",
+                    "In the last month, how often have you felt that you were unable to control the important things in your life?",
+                    "In the last month, how often have you felt nervous and stressed?",
+                    "In the last month, how often have you felt confident about your ability to handle your personal problems?",
+                    "In the last month, how often have you felt that things were going your way?",
+                    "In the last month, how often have you found that you could not cope with all the things that you had to do?",
+                    "In the last month, how often have you been able to control irritations in your life?",
+                    "In the last month, how often have you felt that you were on top of things?",
+                    "In the last month, how often have you been angered because of things that were outside of your control?",
+                    "In the last month, how often have you felt difficulties were piling up so high that you could not overcome them?"
+                ],
+                options: [
+                    "Never",
+                    "Almost Never",
+                    "Sometimes",
+                    "Fairly Often",
+                    "Very Often"
+                ],
+                reverseScored: [3, 4, 6, 7],
+                scoring: {
+                    ranges: [
+                        { min: 0, max: 13, label: "Low stress", color: "#10b981" },
+                        { min: 14, max: 26, label: "Moderate stress", color: "#f59e0b" },
+                        { min: 27, max: 40, label: "High stress", color: "#ef4444" }
+                    ],
+                    factors: {
+                        helplessness: [0, 1, 2, 5, 8, 9],
+                        self_efficacy: [3, 4, 6, 7]
+                    }
+                }
+            },
+            QLES: {
+                name: "Quality of Life Enjoyment and Satisfaction Questionnaire",
+                instructions: "Taking everything into consideration, during the past week how satisfied have you been with your...",
+                questions: [
+                    "Physical health?",
+                    "Mood?",
+                    "Work?",
+                    "Household activities?",
+                    "Social relationships?",
+                    "Family relationships?",
+                    "Leisure time activities?",
+                    "Ability to function in daily life?",
+                    "Sexual drive, interest and/or performance?",
+                    "Economic status?",
+                    "Living/housing situation?",
+                    "Ability to get around physically without feeling dizzy or unsteady or falling?",
+                    "Your vision in terms of ability to do work or hobbies?",
+                    "Overall sense of well being?",
+                    "Medication? (If not taking any, select N/A)",
+                    "Overall life satisfaction and contentment?"
+                ],
+                options: [
+                    "Very Poor",
+                    "Poor",
+                    "Fair",
+                    "Good",
+                    "Very Good"
+                ],
+                scoring: {
+                    calculate: function(responses) {
+                        const validResponses = responses.filter(r => r !== null);
+                        const sum = validResponses.reduce((a, b) => a + b + 1, 0);
+                        const maxScore = validResponses.length * 5;
+                        const percentage = (sum / maxScore) * 100;
+                        return {
+                            raw: sum,
+                            percentage: percentage,
+                            interpretation: percentage >= 70 ? "Good quality of life" : 
+                                          percentage >= 50 ? "Moderate quality of life" : 
+                                          "Poor quality of life"
+                        };
+                    },
+                    factors: {
+                        physical: [0, 11, 12],
+                        emotional: [1, 13],
+                        social: [4, 5],
+                        occupational: [2, 3],
+                        daily: [6, 7],
+                        overall: [13, 15]
+                    }
+                }
+            }
+        };
+
+        // Application State
+        let appState = {
+            currentAssessment: null,
+            currentQuestion: 0,
+            responses: {},
+            completedAssessments: [],
+            sessionData: {
+                startTime: new Date(),
+                results: {}
+            }
+        };
+
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            loadSavedData();
+            updateAssessmentStatus();
+        });
+
+        function setupEventListeners() {
+            // Assessment selector cards
+            document.querySelectorAll('.assessment-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    if (!this.classList.contains('completed')) {
+                        startAssessment(this.dataset.assessment);
+                    }
+                });
+            });
+
+            // Navigation buttons
+            document.getElementById('prev-btn').addEventListener('click', previousQuestion);
+            document.getElementById('next-btn').addEventListener('click', nextQuestion);
+        }
+
+        function loadSavedData() {
+            const saved = localStorage.getItem('assessmentProgress');
+            if (saved) {
+                const data = JSON.parse(saved);
+                if (confirm('Would you like to continue your previous session?')) {
+                    appState = data;
+                    if (appState.currentAssessment) {
+                        resumeAssessment();
+                    }
+                }
+            }
+        }
+
+        function saveProgress() {
+            localStorage.setItem('assessmentProgress', JSON.stringify(appState));
+        }
+
+        function updateAssessmentStatus() {
+            appState.completedAssessments.forEach(assessment => {
+                const card = document.querySelector(`[data-assessment="${assessment}"]`);
+                if (card) {
+                    card.classList.add('completed');
+                    document.getElementById(`${assessment.toLowerCase()}-status`).textContent = '✓ Completed';
+                }
+            });
+
+            if (appState.completedAssessments.length === 4) {
+                generateComprehensiveReport();
+            }
+        }
+
+        function startAssessment(assessmentType) {
+            appState.currentAssessment = assessmentType;
+            appState.currentQuestion = 0;
+            appState.responses[assessmentType] = [];
+            
+            document.getElementById('assessment-selector').style.display = 'none';
+            document.getElementById('question-container').classList.add('active');
+            
+            displayQuestion();
+            saveProgress();
+        }
+
+        function resumeAssessment() {
+            document.getElementById('assessment-selector').style.display = 'none';
+            document.getElementById('question-container').classList.add('active');
+            displayQuestion();
+        }
+
+        function displayQuestion() {
+            const assessment = assessments[appState.currentAssessment];
+            const questionIndex = appState.currentQuestion;
+            const totalQuestions = assessment.questions.length;
+            
+            // Update progress bar
+            const progress = ((questionIndex + 1) / totalQuestions) * 100;
+            document.getElementById('progress-fill').style.width = `${progress}%`;
+            
+            // Display question
+            const questionDisplay = document.getElementById('question-display');
+            questionDisplay.innerHTML = '';
+            
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'question';
+            
+            let questionText = '';
+            let options = [];
+            
+            if (appState.currentAssessment === 'BDI') {
+                const q = assessment.questions[questionIndex];
+                questionText = `<h4>${questionIndex + 1}. ${q.item}</h4>`;
+                options = q.options;
+            } else {
+                questionText = `<h4>${questionIndex + 1}. ${assessment.questions[questionIndex]}</h4>`;
+                options = assessment.options;
+            }
+            
+            questionDiv.innerHTML = questionText;
+            
+            const optionsDiv = document.createElement('div');
+            optionsDiv.className = 'options';
+            
+            options.forEach((option, index) => {
+                const optionBtn = document.createElement('button');
+                optionBtn.className = 'option';
+                optionBtn.textContent = option;
+                optionBtn.onclick = () => selectOption(index);
+                
+                // Check if already selected
+                if (appState.responses[appState.currentAssessment][questionIndex] === index) {
+                    optionBtn.classList.add('selected');
+                }
+                
+                optionsDiv.appendChild(optionBtn);
+            });
+            
+            questionDiv.appendChild(optionsDiv);
+            questionDisplay.appendChild(questionDiv);
+            
+            // Update navigation buttons
+            document.getElementById('prev-btn').disabled = questionIndex === 0;
+            document.getElementById('next-btn').textContent = 
+                questionIndex === totalQuestions - 1 ? 'Complete' : 'Next';
+        }
+
+        function selectOption(optionIndex) {
+            appState.responses[appState.currentAssessment][appState.currentQuestion] = optionIndex;
+            
+            // Update UI
+            document.querySelectorAll('.option').forEach((btn, index) => {
+                if (index === optionIndex) {
+                    btn.classList.add('selected');
+                } else {
+                    btn.classList.remove('selected');
+                }
+            });
+            
+            saveProgress();
+        }
+
+        function previousQuestion() {
+            if (appState.currentQuestion > 0) {
+                appState.currentQuestion--;
+                displayQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            const assessment = assessments[appState.currentAssessment];
+            const totalQuestions = assessment.questions.length;
+            
+            // Check if current question is answered
+            if (appState.responses[appState.currentAssessment][appState.currentQuestion] === undefined) {
+                alert('Please select an answer before continuing.');
+                return;
+            }
+            
+            if (appState.currentQuestion < totalQuestions - 1) {
+                appState.currentQuestion++;
+                displayQuestion();
+            } else {
+                completeAssessment();
+            }
+        }
+
+        function completeAssessment() {
+            const assessmentType = appState.currentAssessment;
+            const responses = appState.responses[assessmentType];
+            
+            // Calculate scores
+            const score = calculateScore(assessmentType, responses);
+            appState.sessionData.results[assessmentType] = {
+                responses: responses,
+                score: score,
+                timestamp: new Date()
+            };
+            
+            // Mark as completed
+            appState.completedAssessments.push(assessmentType);
+            
+            // Reset current assessment
+            appState.currentAssessment = null;
+            appState.currentQuestion = 0;
+            
+            // Save and update UI
+            saveProgress();
+            updateAssessmentStatus();
+            
+            // Show results or return to selector
+            if (appState.completedAssessments.length === 4) {
+                generateComprehensiveReport();
+            } else {
+                document.getElementById('question-container').classList.remove('active');
+                document.getElementById('assessment-selector').style.display = 'grid';
+                alert(`${assessments[assessmentType].name} completed! Please complete the remaining assessments.`);
+            }
+        }
+
+        function calculateScore(assessmentType, responses) {
+            const assessment = assessments[assessmentType];
+            let totalScore = 0;
+            let factorScores = {};
+            
+            if (assessmentType === 'PSS') {
+                // Handle reverse scoring for PSS
+                responses.forEach((response, index) => {
+                    if (assessment.reverseScored.includes(index)) {
+                        totalScore += (4 - response);
+                    } else {
+                        totalScore += response;
+                    }
+                });
+            } else if (assessmentType === 'QLES') {
+                // Special calculation for QLES
+                return assessment.scoring.calculate(responses);
+            } else {
+                // Standard scoring
+                totalScore = responses.reduce((sum, response) => sum + response, 0);
+            }
+            
+            // Calculate factor scores
+            if (assessment.scoring.factors) {
+                for (const [factor, indices] of Object.entries(assessment.scoring.factors)) {
+                    const factorResponses = indices.map(i => responses[i]).filter(r => r !== undefined);
+                    if (factorResponses.length > 0) {
+                        const factorSum = factorResponses.reduce((sum, r) => sum + r, 0);
+                        factorScores[factor] = factorSum / factorResponses.length;
+                    }
+                }
+            }
+            
+            // Find interpretation
+            let interpretation = '';
+            let severity = '';
+            if (assessment.scoring.ranges) {
+                for (const range of assessment.scoring.ranges) {
+                    if (totalScore >= range.min && totalScore <= range.max) {
+                        interpretation = range.label;
+                        severity = range.color;
+                        break;
+                    }
+                }
+            }
+            
+            return {
+                total: totalScore,
+                factors: factorScores,
+                interpretation: interpretation,
+                severity: severity
+            };
+        }
+
+        function generateComprehensiveReport() {
+            document.getElementById('question-container').classList.remove('active');
+            document.getElementById('assessment-selector').style.display = 'none';
+            document.getElementById('results-container').classList.add('active');
+            
+            const results = appState.sessionData.results;
+            const resultsContent = document.getElementById('results-content');
+            
+            // Check for crisis indicators
+            const crisisCheck = checkCrisisIndicators(results);
+            
+            resultsContent.innerHTML = `
+                ${crisisCheck ? generateCrisisBanner(crisisCheck) : ''}
+                
+                <h2 style="color: var(--dark); margin-bottom: 30px; text-align: center;">
+                    Your Comprehensive Assessment Results
+                </h2>
+                
+                ${generateScoreCards(results)}
+                ${generateIntegratedNarrative(results)}
+                ${generateTherapeuticInterventions(results)}
+                ${generateResourceSection(results)}
+            `;
+        }
+
+        function checkCrisisIndicators(results) {
+            const indicators = [];
+            
+            // Check BDI suicidal ideation (item 9)
+            if (results.BDI && results.BDI.responses[8] >= 1) {
+                indicators.push({
+                    type: 'suicidal_ideation',
+                    severity: results.BDI.responses[8],
+                    message: 'Thoughts of self-harm detected'
+                });
+            }
+            
+            // Check severe anxiety
+            if (results.BAI && results.BAI.score.total >= 36) {
+                indicators.push({
+                    type: 'severe_anxiety',
+                    message: 'Severe anxiety levels detected'
+                });
+            }
+            
+            // Check severe depression
+            if (results.BDI && results.BDI.score.total >= 29) {
+                indicators.push({
+                    type: 'severe_depression',
+                    message: 'Severe depression symptoms detected'
+                });
+            }
+            
+            return indicators.length > 0 ? indicators : null;
+        }
+
+        function generateCrisisBanner(indicators) {
+            return `
+                <div class="crisis-banner">
+                    <h4>⚠️ Important Resources Needed</h4>
+                    <p>Based on your responses, immediate support may be beneficial.</p>
+                    <p><strong>Crisis Resources:</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li>National Suicide Prevention Lifeline: 988</li>
+                        <li>Crisis Text Line: Text HOME to 741741</li>
+                        <li>Emergency Services: 911</li>
+                    </ul>
+                    <p style="margin-top: 15px;">Please reach out to a mental health professional or trusted person for support.</p>
+                </div>
+            `;
+        }
+
+        function generateScoreCards(results) {
+            let html = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">';
+            
+            for (const [assessment, data] of Object.entries(results)) {
+                const assessmentInfo = assessments[assessment];
+                html += `
+                    <div class="score-card">
+                        <h3>${assessmentInfo.name}</h3>
+                        <div class="score-value">${data.score.total}${assessment === 'QLES' ? '%' : ''}</div>
+                        <div class="score-interpretation">${data.score.interpretation}</div>
+                        ${generateFactorAnalysis(assessment, data.score.factors)}
+                    </div>
+                `;
+            }
+            
+            html += '</div>';
+            return html;
+        }
+
+        function generateFactorAnalysis(assessment, factors) {
+            if (!factors || Object.keys(factors).length === 0) return '';
+            
+            let html = '<div class="factor-analysis"><h4 style="font-size: 0.95em; margin-bottom: 10px;">Factor Analysis:</h4>';
+            
+            const factorLabels = {
+                somatic: 'Somatic Symptoms',
+                subjective: 'Subjective Anxiety',
+                panic: 'Panic Symptoms',
+                autonomic: 'Autonomic Symptoms',
+                cognitive: 'Cognitive Symptoms',
+                affective: 'Affective Symptoms',
+                helplessness: 'Perceived Helplessness',
+                self_efficacy: 'Self-Efficacy',
+                physical: 'Physical Well-being',
+                emotional: 'Emotional Well-being',
+                social: 'Social Functioning',
+                occupational: 'Occupational Functioning',
+                daily: 'Daily Activities',
+                overall: 'Overall Satisfaction'
+            };
+            
+            for (const [factor, score] of Object.entries(factors)) {
+                const label = factorLabels[factor] || factor;
+                const displayScore = (score * 25).toFixed(0); // Convert to percentage
+                html += `
+                    <div class="factor-item">
+                        <span class="factor-label">${label}</span>
+                        <span class="factor-score">${displayScore}%</span>
+                    </div>
+                `;
+            }
+            
+            html += '</div>';
+            return html;
+        }
+
+        function generateIntegratedNarrative(results) {
+            const patterns = identifyPatterns(results);
+            const strengths = identifyStrengths(results);
+            
+            return `
+                <div class="narrative-section">
+                    <h2>Your Story of Resilience and Growth</h2>
+                    
+                    <h3>The Current Chapter</h3>
+                    <p>${generateCurrentStateNarrative(results, patterns)}</p>
+                    
+                    <h3>Patterns and Connections (Narrative Lens)</h3>
+                    <p>${generatePatternNarrative(patterns)}</p>
+                    
+                    <h3>Your Strengths and Resources</h3>
+                    <p>${generateStrengthsNarrative(strengths, results)}</p>
+                    
+                    <h3>Values and Life Direction (ACT Perspective)</h3>
+                    <p>${generateValuesNarrative(results)}</p>
+                    
+                    <h3>Skills Assessment (DBT Framework)</h3>
+                    <p>${generateSkillsNarrative(results)}</p>
+                    
+                    <h3>Existential Themes</h3>
+                    <p>${generateExistentialNarrative(results)}</p>
+                </div>
+            `;
+        }
+
+        function identifyPatterns(results) {
+            const patterns = [];
+            
+            // Anxiety-Stress Pattern
+            if (results.BAI?.score.total >= 22 && results.PSS?.score.total >= 14) {
+                patterns.push({
+                    type: 'anxiety-stress',
+                    severity: 'significant',
+                    description: 'The Anxiety and The Overwhelm are working together'
+                });
+            }
+            
+            // Depression-QOL Pattern
+            if (results.BDI?.score.total >= 14 && results.QLES?.score.percentage < 60) {
+                patterns.push({
+                    type: 'mood-quality',
+                    severity: 'moderate',
+                    description: 'Mood challenges are affecting life satisfaction'
+                });
+            }
+            
+            // Somatic Pattern
+            if (results.BAI?.score.factors.somatic > 2) {
+                patterns.push({
+                    type: 'somatic',
+                    severity: 'notable',
+                    description: 'Your body is holding stress and tension'
+                });
+            }
+            
+            return patterns;
+        }
+
+        function identifyStrengths(results) {
+            const strengths = [];
+            
+            // Check for preserved areas
+            if (results.QLES?.score.percentage > 40) {
+                strengths.push('Maintaining some quality of life despite challenges');
+            }
+            
+            if (results.PSS?.score.factors.self_efficacy < 2) {
+                strengths.push('Confidence in handling personal problems remains');
+            }
+            
+            if (results.BDI?.score.total < 20) {
+                strengths.push('Mood remains relatively stable');
+            }
+            
+            return strengths;
+        }
+
+        function generateCurrentStateNarrative(results, patterns) {
+            let narrative = "Based on your responses, ";
+            
+            if (patterns.length > 0) {
+                narrative += `several important themes emerge in your current experience. `;
+                
+                if (patterns.find(p => p.type === 'anxiety-stress')) {
+                    narrative += `"The Anxiety" (score: ${results.BAI?.score.total || 'N/A'}) and "The Overwhelm" (score: ${results.PSS?.score.total || 'N/A'}) appear to be significant characters in your life story right now. `;
+                }
+                
+                if (patterns.find(p => p.type === 'somatic')) {
+                    narrative += `Your body is speaking loudly through physical symptoms - this isn't weakness, but rather your nervous system's attempt to protect you. `;
+                }
+            } else {
+                narrative += `you're navigating life's challenges with notable resilience. `;
+            }
+            
+            narrative += `Remember, these experiences are not who you are - they are temporary weather patterns moving through the landscape of your consciousness.`;
+            
+            return narrative;
+        }
+
+        function generatePatternNarrative(patterns) {
+            if (patterns.length === 0) {
+                return "Your responses suggest a relatively balanced state across different life domains. This is a strength to build upon.";
+            }
+            
+            let narrative = "Looking at how different aspects of your experience connect: ";
+            
+            patterns.forEach(pattern => {
+                narrative += `${pattern.description}. `;
+            });
+            
+            narrative += "These patterns are not fixed - they are simply the current chapter of your story, and you hold the pen to write what comes next.";
+            
+            return narrative;
+        }
+
+        function generateStrengthsNarrative(strengths, results) {
+            if (strengths.length === 0) {
+                return "Even in this challenging time, the fact that you're seeking understanding shows wisdom and courage.";
+            }
+            
+            let narrative = "Despite the challenges you're facing, important strengths remain: ";
+            narrative += strengths.join("; ") + ". ";
+            narrative += "These are not small victories - they are evidence of your resilience and the foundation for your path forward.";
+            
+            return narrative;
+        }
+
+        function generateValuesNarrative(results) {
+            let narrative = "From an ACT perspective, ";
+            
+            if (results.QLES?.score.percentage < 60) {
+                narrative += "there appears to be a gap between your current experience and what matters most to you. This isn't failure - it's valuable information about where to focus your energy. ";
+            }
+            
+            narrative += "Consider: What would you do differently if 'The Anxiety' or 'The Overwhelm' were present but couldn't stop you? What small step toward what matters could you take today, even with these uninvited guests along for the ride?";
+            
+            return narrative;
+        }
+
+        function generateSkillsNarrative(results) {
+            let narrative = "From a DBT skills perspective: ";
+            
+            const skillsNeeded = [];
+            if (results.BAI?.score.total >= 22) {
+                skillsNeeded.push("distress tolerance (TIPP, self-soothe)");
+            }
+            if (results.BDI?.score.total >= 14) {
+                skillsNeeded.push("emotion regulation (PLEASE, opposite action)");
+            }
+            if (results.PSS?.score.total >= 14) {
+                skillsNeeded.push("mindfulness (wise mind, observe-describe-participate)");
+            }
+            
+            if (skillsNeeded.length > 0) {
+                narrative += `Key skill areas to develop include ${skillsNeeded.join(", ")}. `;
+            } else {
+                narrative += "You appear to have a solid foundation of coping skills. ";
+            }
+            
+            narrative += "Remember: it's not about eliminating difficult emotions, but rather building a life worth living while making room for the full range of human experience.";
+            
+            return narrative;
+        }
+
+        function generateExistentialNarrative(results) {
+            let narrative = "From an existential perspective, your experience touches on fundamental human themes: ";
+            
+            if (results.PSS?.score.total >= 14) {
+                narrative += "the tension between freedom and limitation, ";
+            }
+            if (results.BDI?.score.total >= 14) {
+                narrative += "questions of meaning and purpose, ";
+            }
+            if (results.QLES?.score.percentage < 60) {
+                narrative += "the search for authentic living, ";
+            }
+            
+            narrative += "and the universal human experience of suffering. ";
+            narrative += "Consider: What meaning might emerge from this difficult chapter? How might this struggle be shaping who you're becoming?";
+            
+            return narrative;
+        }
+
+        function generateTherapeuticInterventions(results) {
+            const severity = calculateOverallSeverity(results);
+            const interventions = generatePersonalizedInterventions(results, severity);
+            
+            return `
+                <div class="narrative-section">
+                    <h2>Your Personalized Path Forward</h2>
+                    
+                    <h3>Week 1: Foundation Building</h3>
+                    ${generateWeek1Interventions(interventions.immediate)}
+                    
+                    <h3>Weeks 2-4: Building Flexibility</h3>
+                    ${generateWeeks24Interventions(interventions.shortTerm)}
+                    
+                    <h3>Months 2-3: Integration and Growth</h3>
+                    ${generateMonths23Interventions(interventions.longTerm)}
+                </div>
+            `;
+        }
+
+        function calculateOverallSeverity(results) {
+            let severityScore = 0;
+            let count = 0;
+            
+            if (results.BAI) {
+                severityScore += results.BAI.score.total >= 36 ? 3 : results.BAI.score.total >= 22 ? 2 : 1;
+                count++;
+            }
+            if (results.BDI) {
+                severityScore += results.BDI.score.total >= 29 ? 3 : results.BDI.score.total >= 20 ? 2 : 1;
+                count++;
+            }
+            if (results.PSS) {
+                severityScore += results.PSS.score.total >= 27 ? 3 : results.PSS.score.total >= 14 ? 2 : 1;
+                count++;
+            }
+            
+            const average = count > 0 ? severityScore / count : 1;
+            return average >= 2.5 ? 'severe' : average >= 1.5 ? 'moderate' : 'mild';
+        }
+
+        function generatePersonalizedInterventions(results, severity) {
+            const interventions = {
+                immediate: [],
+                shortTerm: [],
+                longTerm: []
+            };
+            
+            // ACT Interventions
+            if (results.BAI?.score.total >= 22 || results.PSS?.score.total >= 14) {
+                interventions.immediate.push({
+                    framework: 'ACT',
+                    title: 'Dropping Anchor Practice',
+                    description: 'When anxiety rises: Acknowledge it ("Here\'s anxiety"), Connect with your body (press feet into floor), Engage with the world (notice 5 things you see)',
+                    rationale: 'Creates psychological flexibility in the moment of distress'
+                });
+            }
+            
+            // DBT Interventions
+            if (results.BAI?.score.factors.somatic > 2) {
+                interventions.immediate.push({
+                    framework: 'DBT',
+                    title: 'TIPP for Body Regulation',
+                    description: 'Temperature (cold water on face), Intense exercise (jumping jacks), Paced breathing (4-7-8), Paired muscle relaxation',
+                    rationale: 'Your body is holding anxiety - these techniques reset your nervous system quickly'
+                });
+            }
+            
+            // Narrative Interventions
+            interventions.immediate.push({
+                framework: 'Narrative',
+                title: 'Externalize the Problem',
+                description: 'Name your anxiety/stress (e.g., "The Storm," "The Controller"). Daily journal: "Today The [Name] tried to convince me that... However, I also noticed..."',
+                rationale: 'Separates you from the problem, creating space for agency'
+            });
+            
+            // Existential Interventions
+            if (severity === 'moderate' || severity === 'severe') {
+                interventions.shortTerm.push({
+                    framework: 'Existential',
+                    title: 'Meaning-Making Practice',
+                    description: 'Weekly reflection: "This struggle is teaching me..." and "Despite this difficulty, I choose to..."',
+                    rationale: 'Transforms suffering into growth and maintains agency'
+                });
+            }
+            
+            // Add more specific interventions based on patterns
+            if (results.BDI?.score.total >= 14) {
+                interventions.shortTerm.push({
+                    framework: 'ACT',
+                    title: 'Values Clarification',
+                    description: 'Identify one daily action aligned with what matters most, regardless of mood',
+                    rationale: 'Reconnects you with purpose beyond current emotional state'
+                });
+                
+                interventions.shortTerm.push({
+                    framework: 'DBT',
+                    title: 'PLEASE Skills',
+                    description: 'Treat PhysicaL illness, balance Eating, avoid mood-Altering substances, balance Sleep, get Exercise',
+                    rationale: 'Reduces emotional vulnerability through physical self-care'
+                });
+            }
+            
+            // Long-term interventions
+            interventions.longTerm.push({
+                framework: 'Integrated',
+                title: 'Values-Based Distress Tolerance',
+                description: 'When distressed, connect to WHY you\'re willing to feel this (ACT values) while using TIPP (DBT skills)',
+                rationale: 'Combines meaning with immediate relief strategies'
+            });
+            
+            return interventions;
+        }
+
+        function generateWeek1Interventions(interventions) {
+            let html = '';
+            interventions.forEach(intervention => {
+                html += `
+                    <div class="intervention-card">
+                        <span class="framework-badge ${intervention.framework.toLowerCase()}">${intervention.framework}</span>
+                        <h4>${intervention.title}</h4>
+                        <p><strong>Practice:</strong> ${intervention.description}</p>
+                        <p><em>Why this helps:</em> ${intervention.rationale}</p>
+                    </div>
+                `;
+            });
+            return html;
+        }
+
+        function generateWeeks24Interventions(interventions) {
+            let html = '';
+            interventions.forEach(intervention => {
+                html += `
+                    <div class="intervention-card">
+                        <span class="framework-badge ${intervention.framework.toLowerCase()}">${intervention.framework}</span>
+                        <h4>${intervention.title}</h4>
+                        <p><strong>Practice:</strong> ${intervention.description}</p>
+                        <p><em>Why this helps:</em> ${intervention.rationale}</p>
+                    </div>
+                `;
+            });
+            return html;
+        }
+
+        function generateMonths23Interventions(interventions) {
+            let html = '';
+            interventions.forEach(intervention => {
+                html += `
+                    <div class="intervention-card">
+                        <span class="framework-badge ${intervention.framework.toLowerCase()}">${intervention.framework}</span>
+                        <h4>${intervention.title}</h4>
+                        <p><strong>Practice:</strong> ${intervention.description}</p>
+                        <p><em>Why this helps:</em> ${intervention.rationale}</p>
+                    </div>
+                `;
+            });
+            return html;
+        }
+
+        function generateResourceSection(results) {
+            return `
+                <div class="narrative-section">
+                    <h2>Resources and Support</h2>
+                    
+                    <h3>Crisis Resources</h3>
+                    <ul>
+                        <li>National Suicide Prevention Lifeline: 988</li>
+                        <li>Crisis Text Line: Text HOME to 741741</li>
+                        <li>SAMHSA National Helpline: 1-800-662-4357</li>
+                    </ul>
+                    
+                    <h3>Therapeutic Resources by Approach</h3>
+                    
+                    <h4>ACT Resources</h4>
+                    <ul>
+                        <li>Book: "The Happiness Trap" by Russ Harris</li>
+                        <li>App: ACT Coach (free from VA)</li>
+                        <li>Website: contextualscience.org</li>
+                    </ul>
+                    
+                    <h4>DBT Resources</h4>
+                    <ul>
+                        <li>Book: "DBT Skills Training Handouts" by Marsha Linehan</li>
+                        <li>App: DBT Coach</li>
+                        <li>Website: behavioraltech.org</li>
+                    </ul>
+                    
+                    <h4>Narrative Therapy Resources</h4>
+                    <ul>
+                        <li>Book: "Retelling the Stories of Our Lives" by David Denborough</li>
+                        <li>Website: dulwichcentre.com.au</li>
+                    </ul>
+                    
+                    <h4>Existential Resources</h4>
+                    <ul>
+                        <li>Book: "Man's Search for Meaning" by Viktor Frankl</li>
+                        <li>Book: "When Things Fall Apart" by Pema Chödrön</li>
+                    </ul>
+                    
+                    <h3>When to Seek Professional Help</h3>
+                    <p>Consider reaching out to a mental health professional if:</p>
+                    <ul>
+                        <li>Symptoms interfere with daily functioning for more than 2 weeks</li>
+                        <li>You have thoughts of self-harm or suicide</li>
+                        <li>You're using substances to cope</li>
+                        <li>Relationships are significantly impacted</li>
+                        <li>You want support in implementing these strategies</li>
+                    </ul>
+                </div>
+            `;
+        }
+
+        // Export Functions
+        function exportPDF() {
+            window.print();
+        }
+
+        function exportJSON() {
+            const dataStr = JSON.stringify(appState.sessionData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            const exportFileDefaultName = `assessment_data_${new Date().toISOString().slice(0,10)}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+        function exportWorkbook() {
+            const workbook = generatePersonalWorkbook(appState.sessionData.results);
+            const dataUri = 'data:text/html;charset=utf-8,'+ encodeURIComponent(workbook);
+            const exportFileDefaultName = `personal_workbook_${new Date().toISOString().slice(0,10)}.html`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+        function generatePersonalWorkbook(results) {
+            return `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Personal Therapy Workbook</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+                        h1 { color: #4a90e2; }
+                        h2 { color: #7c3aed; margin-top: 30px; }
+                        .exercise { background: #f9fafb; padding: 20px; margin: 20px 0; border-radius: 8px; }
+                        .prompt { font-weight: bold; margin: 10px 0; }
+                        .space { height: 100px; border: 1px dashed #ccc; margin: 10px 0; padding: 10px; }
+                    </style>
+                </head>
+                <body>
+                    <h1>Your Personal Therapy Workbook</h1>
+                    <p>Generated: ${new Date().toLocaleDateString()}</p>
+                    
+                    <h2>ACT Exercises</h2>
+                    <div class="exercise">
+                        <div class="prompt">Values Clarification</div>
+                        <p>What matters most deeply to you?</p>
+                        <div class="space"></div>
+                        <p>What would you do if anxiety couldn't stop you?</p>
+                        <div class="space"></div>
+                    </div>
+                    
+                    <h2>Narrative Therapy Exercises</h2>
+                    <div class="exercise">
+                        <div class="prompt">Externalization Practice</div>
+                        <p>What name would you give to your anxiety/stress?</p>
+                        <div class="space"></div>
+                        <p>When has this problem had less influence over you?</p>
+                        <div class="space"></div>
+                    </div>
+                    
+                    <h2>DBT Diary Card</h2>
+                    <div class="exercise">
+                        <div class="prompt">Daily Skills Practice</div>
+                        <p>Which DBT skills did you use today?</p>
+                        <div class="space"></div>
+                        <p>Rate your emotions (0-10):</p>
+                        <div class="space"></div>
+                    </div>
+                    
+                    <h2>Existential Reflection</h2>
+                    <div class="exercise">
+                        <div class="prompt">Meaning-Making</div>
+                        <p>What is this struggle teaching you?</p>
+                        <div class="space"></div>
+                        <p>How does this connect to your life's purpose?</p>
+                        <div class="space"></div>
+                    </div>
+                </body>
+                </html>
+            `;
+        }
+
+        function printReport() {
+            window.print();
+        }
+
+        function startNewAssessment() {
+            // Clear all data
+            appState = {
+                currentAssessment: null,
+                currentQuestion: 0,
+                responses: {},
+                completedAssessments: [],
+                sessionData: {
+                    startTime: new Date(),
+                    results: {}
+                }
+            };
+            
+            // Clear local storage
+            localStorage.removeItem('assessmentProgress');
+            
+            // Reset UI
+            document.getElementById('results-container').classList.remove('active');
+            document.getElementById('assessment-selector').style.display = 'grid';
+            document.querySelectorAll('.assessment-card').forEach(card => {
+                card.classList.remove('completed');
+            });
+            document.querySelectorAll('.status').forEach(status => {
+                status.textContent = '';
+            });
+        }
+    </script>
+</body>
+</html>
